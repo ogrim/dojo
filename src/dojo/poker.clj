@@ -4,6 +4,12 @@
 
 ; Coding Dojo - Capgemini Stavanger - 10.09.2012
 
+; Team members:
+;  Kristian Hiim
+;  Anders Njøs Slinde
+;  Daniel Nyvik (did a Quistling after 30 mins)
+;  Aleksander Skjæveland Larsen
+
 (def ts
   {"T" "10" , "J" "11" , "Q" "12" , "K" "13"
    "A" "14" , "2" "2" , "3" "3" , "4" "4"

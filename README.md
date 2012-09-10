@@ -1,13 +1,13 @@
 # dojo
 
-A Clojure library designed to ... well, that part is up to you.
+Solutions to various katas, done at coding dojos
 
-## Usage
+## Current Katas
 
-FIXME
+* poker.clj - not finished - <2012-09-10 Mon>
 
 ## License
 
-Copyright © 2012 FIXME
+Copyright © 2012 Aleksander Skjæveland Larsen & kata team members
 
 Distributed under the Eclipse Public License, the same as Clojure.
