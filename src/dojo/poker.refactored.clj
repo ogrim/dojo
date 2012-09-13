@@ -51,9 +51,9 @@
     (match hand []) no-match))
 
 (defn four-of-a-kind [hand]
-  (let [[f l] (sorted-group-cards hand)] [f l]
-       (if (= (count (val f)) 4)
-         (match (val f) (val l)) no-match)))
+  (let [sorted (sorted-group-cards hand)]
+       (if (= (count (val (first sorted))) 4)
+         (match (val (first sorted)) (val (last sorted))) no-match)))
 
 (defn house [hand]
   (let [[f s] (group-cards hand)]
@@ -61,15 +61,19 @@
       (match hand []) no-match)))
 
 (defn two-pair [hand]
-  (let [[f s] (group-cards hand)]
-    (if (and (= f 2) (= s 2))
-      (match (take 4 hand) [(last hand)]) no-match)))
+  (let [sorted (sorted-group-cards hand)]
+    (if (and (= (-> sorted first val count) 2) (= (-> sorted second val count) 2))
+      (match (-> (take 2 sorted) vals flatten) (val (last sorted))) no-match)))
 
-(defn one-pair? [hand]
-  (= 2 (first (group-cards hand))))
+(defn one-pair [hand]
+  (let [sorted (sorted-group-cards hand)]
+    (if (= 2 (count (first sorted)))
+      (match (val (first sorted)) (-> sorted rest vals flatten)) no-match)))))
 
-(defn three-of-a-kind? [hand]
-  (= 3 (first (group-cards hand))))
+(defn three-of-a-kind [hand]
+  (let [sorted (sorted-group-cards hand)]
+    (if (= (-> sorted first val count) 3)
+      (match (val (first sorted)) (-> sorted rest vals flatten)) no-match)))
 
 (def score-fns
   [{:fn straight-flush :n 8}
@@ -82,36 +86,27 @@
    {:fn one-pair :n 1}
    {:fn nil :n 0}])
 
-(def resolvers
-  {8 :straight-flush
-   7 :four-of-a-kind
-   6 :house
-   5 :flush
-   4 :straight
-   3 :three-of-a-kind
-   2 :two-pair
-   1 :one-pair
-   0 :high-card})
+(comment
+  (defn play [v1 v2]
+    (let [cards1 (parse-hand v1)
+          cards2 (parse-hand v2)
+          s1 (->> (map #(% cards1) score-fns) (drop-while false?))
+          s2 (->> (map #(% cards2) score-fns) (drop-while false?))
+          c1 (count s1)
+          c2 (count s2)]
+      (cond (> c1 c2) :v1
+            (< c1 c2) :v2
+            :else [v1 v2 (resolvers c1)]))))
 
-(defn play [v1 v2]
-  (let [cards1 (parse-hand v1)
-        cards2 (parse-hand v2)
-        s1 (->> (map #(% cards1) score-fns) (drop-while false?))
-        s2 (->> (map #(% cards2) score-fns) (drop-while false?))
-        c1 (count s1)
-        c2 (count s2)]
-    (cond (> c1 c2) :v1
-          (< c1 c2) :v2
-          :else [v1 v2 (resolvers c1)])))
+(comment
+  (defn resolve [v1 v2 ks]
+    (cond (= ks :straight-flush) ()
+          (= ks :straight) ()
+          (= ks :flush) ()
+          (= ks :high-card) ()
+          :else nil)))
 
-(defn resolve [v1 v2 ks]
-  (cond (= ks :straight-flush) ()
-        (= ks :straight) ()
-        (= ks :flush) ()
-        (= ks :high-card) ()
-        :else nil))
-
-(score "3H 9H 9S 9C KD" "3D 8H 8S 8C QD")
+;(play "3H 9H 9S 9C KD" "3D 8H 8S 8C QD")
 
 (def k "3D 9C KD QD 2H")
 (def k1 "3D 9D KD QD 2D")
