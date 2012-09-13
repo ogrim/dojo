@@ -68,7 +68,7 @@
 (defn one-pair [hand]
   (let [sorted (sorted-group-cards hand)]
     (if (= 2 (count (first sorted)))
-      (match (val (first sorted)) (-> sorted rest vals flatten)) no-match)))))
+      (match (val (first sorted)) (-> sorted rest vals flatten)) no-match)))
 
 (defn three-of-a-kind [hand]
   (let [sorted (sorted-group-cards hand)]
