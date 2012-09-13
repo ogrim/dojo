@@ -1,6 +1,6 @@
-(ns dojo.poker.refactored
-  (:use [clojure.test])
-  (:require [clojure.string :as str]))
+(ns dojo.poker-refactored
+  (:require [clojure.string :as str])
+  (:gen-class :main true))
 
 (def card-table
   {"T" "10" , "J" "11" , "Q" "12" , "K" "13", "A" "14" , "2" "2"
@@ -33,7 +33,7 @@
 
 (def no-match (assoc (match [] []) :match false))
 
-(defn flush [hand]
+(defn flush-hand [hand]
   (if (same-suit? hand)
     (match hand []) no-match))
 
@@ -76,47 +76,45 @@
       (match (val (first sorted)) (-> sorted rest vals flatten)) no-match)))
 
 (def score-fns
-  [{:fn straight-flush :n 8}
-   {:fn four-of-a-kind :n 7}
-   {:fn house :n 6}
-   {:fn flush :n 5}
-   {:fn straight :n 4}
-   {:fn three-of-a-kind :n 3}
-   {:fn two-pair :n 2}
-   {:fn one-pair :n 1}
-   {:fn nil :n 0}])
+  [straight-flush
+   four-of-a-kind
+   house
+   flush-hand
+   straight
+   three-of-a-kind
+   two-pair
+   one-pair])
 
-(comment
-  (defn play [v1 v2]
-    (let [cards1 (parse-hand v1)
-          cards2 (parse-hand v2)
-          s1 (->> (map #(% cards1) score-fns) (drop-while false?))
-          s2 (->> (map #(% cards2) score-fns) (drop-while false?))
-          c1 (count s1)
-          c2 (count s2)]
-      (cond (> c1 c2) :v1
-            (< c1 c2) :v2
-            :else [v1 v2 (resolvers c1)]))))
+(defn high-card [hand1 hand2]
+  (loop [[c1 & m1] (->> hand1 (sort-by :value) reverse (map :value))
+         [c2 & m2] (->> hand2 (sort-by :value) reverse (map :value))]
+    (cond (or (nil? c1) (nil? c2)) false
+          (> c1 c2) :player-1
+          (< c1 c2) :player-2
+          :else (recur m1 m2))))
 
-(comment
-  (defn resolve [v1 v2 ks]
-    (cond (= ks :straight-flush) ()
-          (= ks :straight) ()
-          (= ks :flush) ()
-          (= ks :high-card) ()
-          :else nil)))
+(defn resolve-hand [score1 score2]
+  (let [in-rank (high-card (:in-rank score1) (:in-rank score2))
+        not-in-rank (high-card (:not-in-rank score1) (:not-in-rank score2))]
+    (cond in-rank in-rank
+          not-in-rank not-in-rank
+          :else :tie)))
 
-;(play "3H 9H 9S 9C KD" "3D 8H 8S 8C QD")
+(defn play [hand1 hand2]
+  (let [[fs1 :as score1] (->> (map #(% hand1) score-fns) (drop-while #(false? (:match %))))
+        [fs2 :as score2] (->> (map #(% hand2) score-fns) (drop-while #(false? (:match %))))
+        c1 (count score1)
+        c2 (count score2)]
+    (cond (> c1 c2) :player-1
+          (< c1 c2) :player-2
+          :else (resolve-hand fs1 fs2))))
 
-(def k "3D 9C KD QD 2H")
-(def k1 "3D 9D KD QD 2D")
-(def k2 "6D 9D 7D 8D TD")
-(def k3 "9D 9H 9S 9C KD")
-(def k4 "3D 9H 9S 9C KD")
-(def k5 "3D 2H 9S 9C KD")
-(def k6 "3D 3H 9S 9C 9D")
-(def k7 "3D 3H 9S 9C 7D")
-
-(deftest test1
-  (is (= (flush (parse-hand k)) false))
-  (is (= (flush (parse-hand k1)) true)))
+(defn -main []
+  (let [hand1 (do (println "Enter player 1's hand:") (read-line))
+        hand2 (do (println "Enter player 2's hand:") (read-line))
+        result (play (parse-hand hand1) (parse-hand hand2))]
+    (do (cond (= result :player-1) (println "Player 1 won!")
+              (= result :player-2) (println "Player 2 won!")
+              :else (println "It's a tie!"))
+        (println)
+        (recur))))
