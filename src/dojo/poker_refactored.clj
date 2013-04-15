@@ -113,8 +113,8 @@
   (let [hand1 (do (println "Enter player 1's hand:") (read-line))
         hand2 (do (println "Enter player 2's hand:") (read-line))
         result (play (parse-hand hand1) (parse-hand hand2))]
-    (do (cond (= result :player-1) (println "Player 1 won!")
-              (= result :player-2) (println "Player 2 won!")
-              :else (println "It's a tie!"))
-        (println)
-        (recur))))
+    (cond (= result :player-1) (println "Player 1 won!")
+          (= result :player-2) (println "Player 2 won!")
+          :else (println "It's a tie!"))
+    (println)
+    (recur)))
