@@ -1,5 +1,14 @@
 (ns dojo.reversi)
 
+;; Coding Dojo - Capgemini Stavanger - 15.04.2013
+
+;; Team members:
+;;  Bjørn Asle Taranger
+;;  Anshumali
+;;  Mads Tordal
+;;  Aleksander Skjæveland Larsen
+
+
 (def initial-board
   #{[:black 3 3] [:black 4 4]
     [:white 3 4] [:white 4 3]})

@@ -10,7 +10,7 @@ Solutions to various katas, done at coding dojos
     | poker_refactored.clj | Poker Hands           | finished     | 2012-09-13 Thu |   98 |
     | gol.clj              | Conway's Game of Life | finished     | 2012-11-13 Tue |   52 |
     | gol_refactored.clj   | Conway's Game of Life | finished     | 2012-11-20 Tue |   11 |
-    | reversi.clj          | Reversi               | not finished |                |      |
+    | reversi.clj          | Reversi (Othello)     | not finished | 2013-04-15 Mon |   52 |
     | calc.clj             | String Calculator     | not finished | 2013-09-24 Ti  |   23 |
 
 ## License
